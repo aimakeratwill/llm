@@ -28,7 +28,8 @@ resource "azurerm_public_ip" "pip" {
   name                = "ollama-pip"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
-  allocation_method   = "Dynamic"
+  allocation_method   = "Static"
+  sku                 = "Standard"
 }
 
 resource "azurerm_network_interface" "nic" {
@@ -57,7 +58,7 @@ resource "azurerm_network_security_group" "nsg" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "22"
-    source_address_prefix      = "172.56.75.44 /32"
+    source_address_prefix      = "172.56.75.44/32"
     destination_address_prefix = "*"
   }
 
@@ -69,7 +70,7 @@ resource "azurerm_network_security_group" "nsg" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "11434"
-    source_address_prefix      = "172.56.75.44 /32"
+    source_address_prefix      = "172.56.75.44/32"
     destination_address_prefix = "*"
   }
 }

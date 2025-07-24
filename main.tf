@@ -1,6 +1,6 @@
 provider "azurerm" {
   features {}
-  subnet_id = "327bc437-5dbc-4cc4-a3c5-9f705e0eab7d"
+  subscription_id = "327bc437-5dbc-4cc4-a3c5-9f705e0eab7d"
 }
 
 

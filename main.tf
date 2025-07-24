@@ -79,7 +79,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
   name                = "ollama-vm"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
-  size                = "Standard_B2s"
+  size                = "Standard_D4s_v3"
   admin_username      = "azureuser"
   network_interface_ids = [
     azurerm_network_interface.nic.id,

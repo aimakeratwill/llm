@@ -1,0 +1,10 @@
+#cloud-config
+package_update: true
+packages:
+  - docker.io
+  - docker-compose
+runcmd:
+  - systemctl enable docker
+  - systemctl start docker
+  - docker pull ollama/ollama
+  - docker run -d -p 11434:11434 --name ollama ollama/ollama

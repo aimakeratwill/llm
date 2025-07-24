@@ -1,10 +1,45 @@
 #cloud-config
 package_update: true
-packages:
-  - docker.io
-  - docker-compose
+package_upgrade: true
+
 runcmd:
+  # Install Docker
+  - apt-get update
+  - apt-get install -y docker.io docker-compose nginx ufw
+
+  # Enable Docker service
   - systemctl enable docker
   - systemctl start docker
-  - docker pull ollama/ollama
-  - docker run -d -p 11434:11434 --name ollama ollama/ollama
+
+  # Install Ollama via Docker (with REST API exposure)
+  - docker run -d --name ollama -p 11434:11434 ollama/ollama
+
+  # Pull models via Ollama CLI container instance
+  - docker exec ollama ollama pull mistral
+  - docker exec ollama ollama pull llama3
+  - docker exec ollama ollama pull codellama
+  - docker exec ollama ollama pull gemma
+  - docker exec ollama ollama pull orca-mini
+  - docker exec ollama ollama pull dolphin-mixtral
+  - docker exec ollama ollama pull tinyllama
+
+  # Setup Flowise Docker container
+  - docker volume create flowise
+  - docker run -d -p 3000:3000 --name flowise -e FLOWISE_USERNAME=admin -e FLOWISE_PASSWORD=admin -v flowise:/root/.flowise flowiseai/flowise
+
+  # Install NGINX and expose Ollama with reverse proxy
+  - echo '
+    server {
+      listen 80;
+      server_name _;
+      location /ollama/ {
+        proxy_pass http://localhost:11434/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+      }
+    }' > /etc/nginx/sites-available/ollama
+
+  - ln -s /etc/nginx/sites-available/ollama /etc/nginx/sites-enabled/
+  - nginx -t && systemctl reload nginx
